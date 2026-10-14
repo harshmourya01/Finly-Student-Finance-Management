@@ -1,0 +1,4 @@
+# Preserve platform-native wrapper line endings while normalizing stored text.
+backend/mvnw.cmd text eol=crlf
+backend/mvnw text eol=lf
+*.sh text eol=lf

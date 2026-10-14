@@ -1,0 +1,57 @@
+.money-page { color: #e9eee9; }
+.money-page-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 25px; }
+.money-eyebrow { margin: 0 0 7px; color: #879188; font-size: 10px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.money-page-heading h1 { margin: 0; font-family: Manrope, Inter, sans-serif; font-size: 31px; line-height: 1.1; letter-spacing: -.04em; }
+.money-intro { margin: 8px 0 0; color: #99a59c; font-size: 14px; }
+.money-add-button, .money-submit-button { border: 0; border-radius: 8px; background: #d7f59f; padding: 10px 14px; color: #26351c; font-size: 12px; font-weight: 700; cursor: pointer; }
+.money-add-button:hover, .money-submit-button:hover:not(:disabled) { background: #e0f8ad; }
+.money-add-button span { margin-right: 5px; font-size: 15px; }
+.money-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid #29322b; }
+.money-tab { display: flex; align-items: center; gap: 6px; border: 0; border-bottom: 2px solid transparent; background: none; padding: 0 13px 11px; color: #929d94; font-size: 12px; font-weight: 600; cursor: pointer; }
+.money-tab.active { border-color: #c9ef90; color: #edf0eb; }
+.money-tab b { border-radius: 10px; background: #292d29; padding: 2px 6px; color: #c3cbc4; font-size: 10px; font-weight: 600; }
+.money-filter-bar { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; border: 1px solid #29322b; border-radius: 11px; background: #171d19; padding: 11px; }
+.money-filter-bar select, .money-search-field, .money-amount-filter input { min-width: 0; height: 36px; border: 1px solid #303a32; border-radius: 7px; outline: none; background: #202721; padding: 0 10px; color: #c3ccc4; font-size: 11px; }
+.money-filter-bar select:focus, .money-search-field:focus-within, .money-amount-filter input:focus { border-color: #a5d872; }
+.money-filter-label select { min-width: 135px; }
+.money-search-field { display: flex; width: min(240px, 27vw); flex: 1 1 180px; align-items: center; gap: 7px; color: #858b84; }
+.money-search-field > span { font-size: 18px; }
+.money-search-field input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: #eef0ed; font-size: 11px; }
+.money-search-field input::placeholder, .money-amount-filter input::placeholder { color: #778078; }
+.money-amount-filter input { width: 100px; }
+.money-clear-filters { margin-left: auto; border: 0; background: none; padding: 8px; color: #b5df83; font-size: 11px; white-space: nowrap; cursor: pointer; }
+.money-panel { min-width: 0; border: 1px solid #29322b; border-radius: 12px; background: #171d19; }
+.money-transactions-panel { min-height: 400px; padding: 19px 0 0; }
+.money-panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 0 19px 16px; }
+.money-panel-heading h2 { margin: 0; color: #edf2ed; font-family: Manrope, Inter, sans-serif; font-size: 15px; letter-spacing: -.02em; }
+.money-panel-heading p { margin: 4px 0 0; color: #929f95; font-size: 11px; }
+.money-visible-count { border-radius: 6px; background: #242a25; padding: 6px 9px; color: #a7b1a8; font-size: 11px; white-space: nowrap; }
+.money-table-scroll { overflow: auto; border-top: 1px solid #29322b; }
+.money-table { width: 100%; min-width: 820px; border-collapse: collapse; }
+.money-table th { padding: 11px 17px; color: #818c82; font-size: 9px; font-weight: 600; letter-spacing: .07em; text-align: left; text-transform: uppercase; white-space: nowrap; }
+.money-table td { padding: 11px 17px; border-top: 1px solid #252e27; color: #aeb7af; font-size: 11px; white-space: nowrap; }
+.money-table td:nth-child(2) { color: #eff2ef; }.money-table td strong { font-weight: 500; }
+.money-transaction-icon { display: inline-grid; width: 25px; height: 25px; margin-right: 8px; place-items: center; border-radius: 6px; vertical-align: middle; font-size: 12px; }
+.money-transaction-icon.income { background: #1e3e2e; color: #89dfad; }.money-transaction-icon.expense { background: #35452e; }
+.money-category-tag, .money-type-tag { display: inline-block; border-radius: 4px; padding: 3px 6px; font-size: 10px; }
+.money-category-tag.income-tag { background: #204230; color: #87d9a9; }.money-category-tag.expense-tag { background: #2b352a; color: #afd98a; }
+.money-type-tag.income { background: #204230; color: #87d9a9; }.money-type-tag.expense { background: #3a2d2c; color: #cfaaa5; }
+.money-amount { font-weight: 650; }.money-amount.income { color: #83dca8; }.money-amount.expense { color: #e3ae9b; }
+.money-row-actions { display: flex; gap: 7px; }.money-row-actions button { border: 0; background: transparent; padding: 4px; font-size: 10px; cursor: pointer; }.money-row-actions .edit { color: #b7e687; }.money-row-actions .delete { color: #d8978b; }
+.money-empty-state, .money-loading { display: grid; min-height: 290px; align-content: center; justify-items: center; padding: 32px; text-align: center; }
+.money-empty-state > span { display: grid; width: 42px; height: 42px; margin-bottom: 13px; place-items: center; border: 1px solid #334337; border-radius: 12px; background: #202b22; color: #c9f28a; font-size: 18px; }
+.money-empty-state h3 { margin: 0 0 7px; color: #e7eee7; font-size: 14px; }.money-empty-state p, .money-loading { margin: 0; color: #89968c; font-size: 12px; line-height: 1.6; }
+.money-message { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 30px 20px; }.money-message p { margin: 0; color: #e7b4ad; font-size: 12px; }.money-message button { border: 1px solid #63413b; border-radius: 7px; background: transparent; padding: 7px 10px; color: #f0c3bd; font-size: 11px; cursor: pointer; }
+.money-modal-backdrop { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; overflow-y: auto; background: #090a09bf; padding: 20px; }
+.money-transaction-modal { width: min(100%, 590px); max-height: min(92vh, 780px); overflow: auto; border: 1px solid #353d36; border-radius: 13px; background: #1b211c; box-shadow: 0 20px 70px #000; padding: 22px; }
+.money-modal-heading { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #2b332d; padding-bottom: 17px; }.money-modal-heading p { margin: 0 0 5px; color: #89948a; font-size: 10px; font-weight: 700; letter-spacing: .12em; }.money-modal-heading h2 { margin: 0; color: #eff3ef; font-family: Manrope, Inter, sans-serif; font-size: 20px; letter-spacing: -.03em; }
+.money-modal-close { border: 0; background: none; color: #a6afa7; font-size: 25px; line-height: 20px; cursor: pointer; }.money-modal-close:disabled { opacity: .5; cursor: wait; }
+.money-form { display: grid; gap: 0; }.money-spendable-note { margin: 16px 0 0; border: 1px solid #34432d; border-radius: 7px; background: #20291e; padding: 10px 12px; color: #c9eba8; font-size: 12px; }.money-spendable-note strong { color: #e3f6d2; }.money-spendable-note.unavailable { border-color: #554b32; background: #29251b; color: #e8d09c; }
+.money-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 18px 0; }.money-form-grid label { display: grid; gap: 7px; color: #bbc5bc; font-size: 11px; }.money-form-grid label span { color: #7f8a80; font-weight: 400; }.money-form-grid input, .money-form-grid select, .money-form-grid textarea { width: 100%; min-height: 38px; border: 1px solid #343e35; border-radius: 7px; outline: none; background: #222923; padding: 9px; color: #eef0ed; font-size: 12px; }.money-form-grid textarea { height: 62px; resize: vertical; }.money-form-grid input:focus, .money-form-grid select:focus, .money-form-grid textarea:focus { border-color: #a5d872; }.money-notes-field { grid-column: 1 / -1; }
+.money-form-error { margin: 0 0 12px; color: #e7a29a; font-size: 11px; line-height: 1.5; }.money-modal-actions { display: flex; justify-content: flex-end; gap: 9px; border-top: 1px solid #2b332d; padding-top: 15px; }.money-cancel-button { border: 1px solid #393f3a; border-radius: 8px; background: transparent; padding: 9px 13px; color: #d5d8d4; font-size: 11px; cursor: pointer; }.money-submit-button { min-width: 122px; padding: 9px 13px; font-size: 11px; }.money-submit-button:disabled { opacity: .6; cursor: not-allowed; }.money-cancel-button:disabled { opacity: .6; cursor: wait; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+@media (max-width: 1000px) { .money-filter-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }.money-search-field { width: auto; }.money-clear-filters { margin: 0; justify-self: start; } }
+@media (max-width: 680px) { .money-page-heading { align-items: flex-start; }.money-page-heading h1 { font-size: 27px; }.money-add-button { width: 40px; height: 40px; padding: 0; font-size: 0; }.money-add-button span { margin: 0; font-size: 18px; }.money-filter-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 10px; }.money-search-field { grid-column: 1 / -1; }.money-filter-label select, .money-amount-filter input { width: 100%; min-width: 0; }.money-clear-filters { grid-column: 1 / -1; }.money-transactions-panel { padding-top: 16px; }.money-panel-heading { padding: 0 15px 14px; }.money-table { min-width: 780px; }.money-form-grid { grid-template-columns: 1fr; }.money-notes-field { grid-column: auto; }.money-transaction-modal { padding: 18px; } }
+.money-page-error { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; border: 1px solid #61413b; border-radius: 8px; background: #2b201e; padding: 10px 12px; color: #e7b4ad; font-size: 12px; }
+.money-page-error button { border: 0; background: none; color: inherit; font-size: 18px; cursor: pointer; }
+.money-balance-warning { margin: 0 0 12px; color: #e8d09c; font-size: 11px; }
