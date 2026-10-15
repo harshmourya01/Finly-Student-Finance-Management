@@ -34,3 +34,19 @@ Database settings remain environment-configurable; the application properties re
 ```sh
 ./mvnw test
 ```
+
+## Docker and Render
+
+The backend Docker image builds the executable JAR with Maven and Java 21, then runs it on a Java 21 JRE as a non-root user. The application listens on Render's `PORT` environment variable and defaults to port `8080` when it is unset. `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, and the required `JWT_SECRET` remain supplied through environment variables; no credentials are included in the image.
+
+Build and run locally after exporting the required database and JWT variables described above:
+
+```sh
+docker build -t finly-backend .
+docker run --rm -p 8080:8080 \
+  --env DB_URL --env DB_USERNAME --env DB_PASSWORD --env JWT_SECRET \
+  --env JWT_EXPIRATION --env PORT \
+  finly-backend
+```
+
+For Render, create a Web Service from this repository, set its root directory to `backend`, and select the Docker runtime. Configure `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, and `JWT_SECRET` in the service environment. Set `DB_URL` to the JDBC URL supplied for the Neon database (including its required SSL parameters). `PORT` is provided by Render; `JWT_EXPIRATION` is optional.
