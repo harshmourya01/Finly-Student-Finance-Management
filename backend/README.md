@@ -12,7 +12,10 @@ export DB_USERNAME='<POSTGRES_USERNAME>'
 export DB_PASSWORD='<POSTGRES_PASSWORD>'
 export JWT_SECRET='<BASE64_RANDOM_KEY_AT_LEAST_32_BYTES>'
 export JWT_EXPIRATION='<TOKEN_LIFETIME_IN_MILLISECONDS>'
+export CORS_ALLOWED_ORIGINS='<FRONTEND_ORIGIN>'
 ```
+
+`CORS_ALLOWED_ORIGINS` is a comma-separated list of exact browser origins (scheme, host, and optional port; no path). Its local development default allows the existing localhost frontends. For Render, set it to the deployed Vercel origin, such as `https://your-app.vercel.app`.
 
 Database settings remain environment-configurable; the application properties retain local development defaults where configured. Hibernate uses `ddl-auto=update` for local development.
 
@@ -49,4 +52,4 @@ docker run --rm -p 8080:8080 \
   finly-backend
 ```
 
-For Render, create a Web Service from this repository, set its root directory to `backend`, and select the Docker runtime. Configure `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, and `JWT_SECRET` in the service environment. Set `DB_URL` to the JDBC URL supplied for the Neon database (including its required SSL parameters). `PORT` is provided by Render; `JWT_EXPIRATION` is optional.
+For Render, create a Web Service from this repository, set its root directory to `backend`, and select the Docker runtime. Configure `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, and `CORS_ALLOWED_ORIGINS` in the service environment. Set `DB_URL` to the JDBC URL supplied for the Neon database (including its required SSL parameters). `CORS_ALLOWED_ORIGINS` must contain the exact deployed Vercel origin. `PORT` is provided by Render; `JWT_EXPIRATION` is optional.
