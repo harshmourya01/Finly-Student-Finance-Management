@@ -7,8 +7,10 @@ import com.studentfinance.dto.UserResponse;
 import com.studentfinance.entity.User;
 import com.studentfinance.exception.EmailAlreadyExistsException;
 import com.studentfinance.repository.UserRepository;
+import com.studentfinance.security.CustomUserDetails;
 import com.studentfinance.security.JwtUtils;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,12 +60,18 @@ user.setPassword(passwordEncoder.encode(request.password()));
     public AuthResponse login(LoginRequest request) {
         String normalizedEmail = request.email().trim().toLowerCase();
 
-        authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(normalizedEmail, request.password())
         );
 
-        User user = userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+        User user;
+        if (authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            user = userDetails.getUser();
+        } else {
+            // Preserve compatibility if the configured authentication provider changes its principal type.
+            user = userRepository.findByEmail(normalizedEmail)
+                    .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+        }
 
         String token = jwtUtils.generateToken(user.getEmail());
 
