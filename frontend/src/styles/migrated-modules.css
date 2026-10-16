@@ -58,3 +58,6 @@
   #printable-report p, #printable-report span, #printable-report small, #printable-report th { color: #444; }
   .module-table td { border-color: #ddd; }
 }
+
+.settings-sound label { display: flex; min-width: 175px; align-items: center; justify-content: flex-end; gap: 12px; }
+.settings-sound input { width: 18px; height: 18px; accent-color: #a9d577; cursor: pointer; }

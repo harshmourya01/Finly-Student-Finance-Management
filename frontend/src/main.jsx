@@ -5,14 +5,17 @@ import './index.css'
 import './styles/migrated-modules.css'
 import App from './App.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
+import { NotificationSoundProvider } from './context/NotificationSoundContext.jsx'
 import './styles/theme.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <NotificationSoundProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </NotificationSoundProvider>
     </ThemeProvider>
   </StrictMode>,
 )

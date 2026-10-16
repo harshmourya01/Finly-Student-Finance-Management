@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getCurrentUser, logout } from '../services/auth.js'
 import { useTheme } from '../context/ThemeContext.jsx'
+import { useNotificationSound } from '../hooks/useNotificationSound.js'
 
 function initials(name = '') {
   const parts = name.trim().split(/\s+/).filter(Boolean)
@@ -11,6 +12,7 @@ function initials(name = '') {
 export default function SettingsPage() {
   const navigate = useNavigate(); const [user, setUser] = useState(null); const [loading, setLoading] = useState(true); const [error, setError] = useState(''); const [attempt, setAttempt] = useState(0)
   const { theme, setTheme } = useTheme()
+  const { enabled: notificationSoundEnabled, setSoundEnabled } = useNotificationSound()
   useEffect(() => {
     let active = true; setLoading(true); setError('')
     getCurrentUser().then((account) => { if (active) setUser(account) }).catch((reason) => { if (active) setError(reason.message || 'Could not load your account information.') }).finally(() => { if (active) setLoading(false) })
@@ -23,6 +25,7 @@ export default function SettingsPage() {
       {loading ? <p className="settings-message" role="status">Loading account information…</p> : error ? <div className="settings-message" role="alert"><p>{error}</p><button type="button" className="module-secondary" onClick={() => setAttempt((value) => value + 1)}>Try again</button></div> : <div className="settings-identity"><div className="settings-avatar" aria-hidden="true">{initials(user?.fullName)}</div><div><span>Full name</span><strong>{user?.fullName}</strong><span>Email address</span><strong>{user?.email}</strong></div></div>}
     </section>
     <section className="module-panel settings-theme" aria-labelledby="theme-heading"><div><h2 id="theme-heading">Appearance</h2><p>Choose how Finly looks on this device.</p></div><label htmlFor="theme-choice">Theme<select id="theme-choice" value={theme} onChange={(event) => setTheme(event.target.value)}><option value="dark">Dark mode</option><option value="light">Light mode</option></select></label></section>
+    <section className="module-panel settings-theme settings-sound" aria-labelledby="sound-heading"><div><h2 id="sound-heading">Notification sound</h2><p>Play a gentle chime when a new in-app notification arrives.</p></div><label htmlFor="notification-sound-choice"><span>Sound</span><input id="notification-sound-choice" type="checkbox" checked={notificationSoundEnabled} onChange={(event) => setSoundEnabled(event.target.checked)} /></label></section>
     <section className="module-panel settings-account"><div><h2>Account session</h2><p>Sign out of this account on this device.</p></div><button type="button" className="module-secondary settings-logout" onClick={handleLogout}>Log out</button></section>
   </div>
 }
