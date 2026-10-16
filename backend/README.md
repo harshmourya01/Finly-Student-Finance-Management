@@ -17,7 +17,13 @@ export CORS_ALLOWED_ORIGINS='<FRONTEND_ORIGIN>'
 
 `CORS_ALLOWED_ORIGINS` is a comma-separated list of exact browser origins (scheme, host, and optional port; no path). Its local development default allows the existing localhost frontends. For Render, set it to the deployed Vercel origin, such as `https://your-app.vercel.app`.
 
-Database settings remain environment-configurable; the application properties retain local development defaults where configured. Hibernate uses `ddl-auto=update` for local development.
+Database settings remain environment-configurable. Hibernate is configured with `ddl-auto=validate`; Flyway owns schema changes. Versioned migrations are in `src/main/resources/db/migration`.
+
+### Database migrations
+
+For a new database, Flyway applies `V1__baseline_finly_schema.sql` and then the later versioned migrations. For an existing Finly database without Flyway history, `spring.flyway.baseline-on-migrate=true` and baseline version `1` record the existing schema as the V1 baseline; Flyway then applies V2 and later migrations. Hibernate validates the resulting schema at startup and does not alter it.
+
+Before applying this to any shared database, validate against an isolated Neon branch cloned from the intended database. Confirm the existing core schema matches the current entity mappings, deploy the candidate backend only against that branch, and verify Flyway history plus all tables, constraints, and indexes. Take a recoverable Neon backup/branch before production migration. Apply migrations in order, verify them, then start the backend. Never treat `ddl-auto=update` as a production migration. This repository change does not run migrations against any production database.
 
 ## Run
 
@@ -53,3 +59,5 @@ docker run --rm -p 8080:8080 \
 ```
 
 For Render, create a Web Service from this repository, set its root directory to `backend`, and select the Docker runtime. Configure `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, and `CORS_ALLOWED_ORIGINS` in the service environment. Set `DB_URL` to the JDBC URL supplied for the Neon database (including its required SSL parameters). `CORS_ALLOWED_ORIGINS` must contain the exact deployed Vercel origin. `PORT` is provided by Render; `JWT_EXPIRATION` is optional.
+
+The container starts Flyway before Hibernate schema validation. Existing databases with no Flyway history are baselined at version 1, then receive the additive later migrations. Verify that behavior on an isolated Neon branch before production use.

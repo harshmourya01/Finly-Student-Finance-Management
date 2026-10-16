@@ -1,0 +1,11 @@
+package com.studentfinance.entity;
+
+public enum NotificationType {
+    SAVINGS_CONTRIBUTION,
+    SAVINGS_GOAL_COMPLETED,
+    SAVINGS_GOAL_DUE,
+    SUBSCRIPTION_RENEWAL,
+    BUDGET_80_PERCENT,
+    BUDGET_100_PERCENT,
+    TRANSACTION_RECORDED
+}

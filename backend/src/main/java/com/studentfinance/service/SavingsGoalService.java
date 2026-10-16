@@ -5,6 +5,7 @@ import com.studentfinance.dto.SavingsGoalRequest;
 import com.studentfinance.dto.SavingsGoalResponse;
 import com.studentfinance.entity.SavingsGoal;
 import com.studentfinance.entity.User;
+import com.studentfinance.entity.NotificationType;
 import com.studentfinance.repository.SavingsGoalRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,17 @@ public class SavingsGoalService {
 
     private final SavingsGoalRepository savingsGoalRepository;
     private final CurrentUserService currentUserService;
+    private final NotificationService notificationService;
+    private final FinancialIdempotencyService idempotencyService;
 
     public SavingsGoalService(SavingsGoalRepository savingsGoalRepository,
-                              CurrentUserService currentUserService) {
+                              CurrentUserService currentUserService,
+                              NotificationService notificationService,
+                              FinancialIdempotencyService idempotencyService) {
         this.savingsGoalRepository = savingsGoalRepository;
         this.currentUserService = currentUserService;
+        this.notificationService = notificationService;
+        this.idempotencyService = idempotencyService;
     }
 
     @Transactional(readOnly = true)
@@ -50,6 +57,7 @@ public class SavingsGoalService {
     @Transactional
     public SavingsGoalResponse create(SavingsGoalRequest request) {
         User user = currentUserService.getCurrentUser();
+        notificationService.lockOwner(user);
         LocalDate targetDate = parseDate(request.targetDate());
 
         BigDecimal current = request.currentAmount() != null ? request.currentAmount() : BigDecimal.ZERO;
@@ -64,17 +72,21 @@ public class SavingsGoalService {
                 .build();
 
         SavingsGoal saved = savingsGoalRepository.save(goal);
+        notifyCompletionIfReached(saved, BigDecimal.ZERO);
         return toResponse(saved);
     }
 
     @Transactional
     public SavingsGoalResponse update(Long id, SavingsGoalRequest request) {
+        notificationService.lockOwner(currentUserService.getCurrentUser());
         SavingsGoal goal = savingsGoalRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Savings goal not found"));
         verifyOwnership(goal);
 
+        BigDecimal previousSaved = goal.getCurrentAmount();
+        BigDecimal previousTarget = goal.getTargetAmount();
         LocalDate targetDate = parseDate(request.targetDate());
-        BigDecimal current = request.currentAmount() != null ? request.currentAmount() : goal.getCurrentAmount();
+        BigDecimal current = request.currentAmount() != null ? request.currentAmount() : previousSaved;
         validateSavedAmount(request.targetAmount(), current);
 
         goal.setName(request.name().trim());
@@ -83,6 +95,9 @@ public class SavingsGoalService {
         goal.setTargetDate(targetDate);
 
         SavingsGoal saved = savingsGoalRepository.save(goal);
+        if (previousSaved.compareTo(previousTarget) < 0 && current.compareTo(request.targetAmount()) >= 0) {
+            notifyCompletionIfReached(saved, previousSaved);
+        }
         return toResponse(saved);
     }
 
@@ -96,6 +111,22 @@ public class SavingsGoalService {
 
     @Transactional
     public SavingsGoalResponse addMoney(Long id, AddMoneyRequest request) {
+        return addMoney(id, request, null);
+    }
+
+    @Transactional
+    public SavingsGoalResponse addMoney(Long id, AddMoneyRequest request, String idempotencyKey) {
+        User user = currentUserService.getCurrentUser();
+        if (idempotencyKey == null || idempotencyKey.isBlank()) {
+            return addMoneyInternal(id, request, null, user);
+        }
+        return idempotencyService.execute(user, "SAVINGS_GOAL_CONTRIBUTION", idempotencyKey,
+                List.of(id, request.amount().stripTrailingZeros().toPlainString()), SavingsGoalResponse.class,
+                () -> addMoneyInternal(id, request, idempotencyKey, user));
+    }
+
+    private SavingsGoalResponse addMoneyInternal(Long id, AddMoneyRequest request, String idempotencyKey, User user) {
+        notificationService.lockOwner(user);
         SavingsGoal goal = savingsGoalRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Savings goal not found"));
         verifyOwnership(goal);
@@ -106,9 +137,42 @@ public class SavingsGoalService {
                     "Contribution exceeds the remaining goal amount of " + remaining);
         }
 
-        goal.setCurrentAmount(goal.getCurrentAmount().add(request.amount()));
+        BigDecimal previousSaved = goal.getCurrentAmount();
+        goal.setCurrentAmount(previousSaved.add(request.amount()));
         SavingsGoal saved = savingsGoalRepository.save(goal);
+
+        int progress = saved.getCurrentAmount().multiply(BigDecimal.valueOf(100))
+                .divide(saved.getTargetAmount(), 0, java.math.RoundingMode.HALF_UP).intValue();
+        notificationService.create(saved.getUser(), NotificationType.SAVINGS_CONTRIBUTION,
+                "Savings goal updated",
+                currency(request.amount()) + " added to your " + saved.getName() + ". You have reached "
+                        + progress + "% of your target.",
+                saved.getId(), idempotencyKey == null || idempotencyKey.isBlank()
+                        ? "goal:" + saved.getId() + ":saved:" + saved.getCurrentAmount().toPlainString()
+                        : "goal:" + saved.getId() + ":request:" + idempotencyKey.trim());
+        notifyCompletionIfReached(saved, previousSaved);
         return toResponse(saved);
+    }
+
+
+    private void notifyCompletionIfReached(SavingsGoal goal, BigDecimal previousSaved) {
+        if (previousSaved.compareTo(goal.getTargetAmount()) < 0
+                && goal.getCurrentAmount().compareTo(goal.getTargetAmount()) >= 0) {
+            notificationService.create(goal.getUser(), NotificationType.SAVINGS_GOAL_COMPLETED,
+                    "Savings goal reached",
+                    "Congratulations! You have reached your " + currency(goal.getTargetAmount()) + " "
+                            + goal.getName() + " Goal.",
+                    goal.getId(), "goal:" + goal.getId() + ":completed:target:"
+                            + goal.getTargetAmount().toPlainString());
+        }
+    }
+
+    private String currency(BigDecimal amount) {
+        java.text.NumberFormat format = java.text.NumberFormat.getCurrencyInstance(java.util.Locale.forLanguageTag("en-IN"));
+        format.setCurrency(java.util.Currency.getInstance("INR"));
+        format.setMinimumFractionDigits(0);
+        format.setMaximumFractionDigits(2);
+        return format.format(amount);
     }
 
     private void verifyOwnership(SavingsGoal goal) {

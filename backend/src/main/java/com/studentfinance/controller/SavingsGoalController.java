@@ -51,8 +51,9 @@ public class SavingsGoalController {
     }
 
     @PostMapping("/{id}/add-money")
-    public ResponseEntity<SavingsGoalResponse> addMoney(@PathVariable Long id, @Valid @RequestBody AddMoneyRequest request) {
-        SavingsGoalResponse response = savingsGoalService.addMoney(id, request);
+    public ResponseEntity<SavingsGoalResponse> addMoney(@PathVariable Long id, @Valid @RequestBody AddMoneyRequest request,
+                                                        @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        SavingsGoalResponse response = savingsGoalService.addMoney(id, request, idempotencyKey);
         return ResponseEntity.ok(response);
     }
 }

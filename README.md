@@ -74,7 +74,7 @@ $env:JWT_SECRET = '<BASE64_RANDOM_KEY_AT_LEAST_32_BYTES>'
 $env:JWT_EXPIRATION = '<TOKEN_LIFETIME_IN_MILLISECONDS>'
 ```
 
-The placeholders above are examples only. The backend reads PostgreSQL settings from `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Hibernate is configured with `ddl-auto=update` for local development; use an appropriate migration strategy before operating a production database.
+The placeholders above are examples only. The backend reads PostgreSQL settings from `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Flyway applies the versioned backend schema migrations, and Hibernate validates the resulting schema. For an existing database without Flyway history, Flyway baselines it at version 1 and applies subsequent migrations. Validate this on an isolated Neon branch before production use; see `backend/README.md` for the migration procedure.
 
 ## Run locally
 

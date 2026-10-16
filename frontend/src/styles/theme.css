@@ -136,7 +136,7 @@ html[data-theme="light"] .money-intro, html[data-theme="light"] .planning-descri
 
 /* Shared surfaces */
 html[data-theme="light"] :is(.empty-panel, .auth-card, .auth-error-card, .dashboard-summary-card, .dashboard-panel,
-  .notification-panel, .dashboard-menu, .goal-card, .money-filter-bar, .money-panel, .money-transaction-modal,
+  .dashboard-menu, .goal-card, .money-filter-bar, .money-panel, .money-transaction-modal,
   .planning-summary, .planning-card, .planning-empty, .planning-table-wrap, .planning-modal,
   .module-panel, .module-state, .analysis-stats article, .report-stats article) {
   border-color: var(--border) !important;
@@ -146,8 +146,8 @@ html[data-theme="light"] :is(.empty-panel, .auth-card, .auth-error-card, .dashbo
 }
 html[data-theme="light"] .empty-panel { background: var(--surface) !important; }
 html[data-theme="light"] :is(.dashboard-summary-card, .dashboard-panel, .money-panel, .planning-summary, .planning-card, .module-panel) { background: var(--surface) !important; }
-html[data-theme="light"] .dashboard-menu, html[data-theme="light"] .notification-panel { background: var(--surface) !important; box-shadow: 0 12px 30px var(--shadow); }
-html[data-theme="light"] .notification-panel li, html[data-theme="light"] .dashboard-menu button:hover,
+html[data-theme="light"] .dashboard-menu { background: var(--surface) !important; box-shadow: 0 12px 30px var(--shadow); }
+html[data-theme="light"] .dashboard-menu button:hover,
 html[data-theme="light"] .dashboard-menu button:focus-visible, html[data-theme="light"] .goal-card { background: var(--surface-hover); }
 html[data-theme="light"] .planning-card.warning { border-color: #e4c995 !important; }
 html[data-theme="light"] .planning-card.over { border-color: #e5b8b2 !important; }
@@ -180,7 +180,7 @@ html[data-theme="light"] .report-summary-row > div { color: var(--text-secondary
 html[data-theme="light"] .goal-title b, html[data-theme="light"] .savings-goal-metric:last-child strong { color: #7656b1; }
 
 /* Inputs, menus, tables, and modal controls */
-html[data-theme="light"] :is(.dashboard-control, .dashboard-icon-button, .dashboard-select, .analysis-period select, .money-filter-bar select,
+html[data-theme="light"] :is(.dashboard-control, .dashboard-select, .analysis-period select, .money-filter-bar select,
   .auth-field input, .money-search-field, .money-amount-filter input, .money-search-field input, .money-form-grid input,
   .money-form-grid select, .money-form-grid textarea, .planning-field input, .planning-field select,
   .report-controls select, .report-controls input) {

@@ -49,35 +49,3 @@ export function getExpenseCategories(transactions, range) {
     })
   return [...totals.entries()].map(([name, amount]) => ({ name, amount })).sort((a, b) => b.amount - a.amount)
 }
-
-export function getNotifications({ subscriptions, budgets, goals }) {
-  const notices = []
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  subscriptions.filter((item) => String(item.status).toUpperCase() === 'ACTIVE').forEach((item) => {
-    const renewalDate = item.renewal ? new Date(`${item.renewal}T00:00:00`) : null
-    if (!renewalDate || Number.isNaN(renewalDate.getTime())) return
-    const days = Math.ceil((renewalDate - today) / 86_400_000)
-    if (days >= 0 && days <= 7) {
-      notices.push({ title: 'Subscription renewal', text: `${item.name} renews ${days === 0 ? 'today' : days === 1 ? 'tomorrow' : `in ${days} days`}.` })
-    }
-  })
-
-  budgets.forEach((item) => {
-    const limit = Number(item.limit ?? item.amount) || 0
-    const spent = Number(item.spent) || 0
-    if (limit > 0 && spent / limit >= 0.8) {
-      notices.push({ title: spent > limit ? 'Budget exceeded' : 'Budget nearing limit', text: `${item.category || 'A category'} is at ${Math.round(spent / limit * 100)}% of its budget.` })
-    }
-  })
-
-  goals.forEach((item) => {
-    const target = Number(item.target ?? item.targetAmount) || 0
-    const saved = Number(item.saved ?? item.currentAmount) || 0
-    if (target > 0 && saved / target >= 0.8) {
-      notices.push({ title: saved >= target ? 'Savings goal reached' : 'Savings goal nearly reached', text: `${item.name} is ${Math.round(saved / target * 100)}% complete.` })
-    }
-  })
-  return notices
-}

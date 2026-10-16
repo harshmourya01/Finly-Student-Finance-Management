@@ -1,28 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { logout } from '../../services/auth.js'
-import { getNotifications } from '../../utils/dashboard.js'
 
 const periods = [
   ['month', 'This Month'], ['last', 'Last Month'], ['six', 'Last 6 months'], ['year', 'This Year'],
 ]
 
-export default function DashboardToolbar({ data, errors, period, setPeriod }) {
+export default function DashboardToolbar({ period, setPeriod }) {
   const [openMenu, setOpenMenu] = useState(null)
-  const [notificationsOpen, setNotificationsOpen] = useState(false)
   const root = useRef(null)
   const navigate = useNavigate()
-  const notices = getNotifications(data)
   const selectedLabel = periods.find(([key]) => key === period)?.[1] ?? periods[0][1]
 
   useEffect(() => {
     const onPointerDown = (event) => {
       if (!root.current?.contains(event.target)) {
         setOpenMenu(null)
-        setNotificationsOpen(false)
       }
     }
-    const onKeyDown = (event) => { if (event.key === 'Escape') { setOpenMenu(null); setNotificationsOpen(false) } }
+    const onKeyDown = (event) => { if (event.key === 'Escape') setOpenMenu(null) }
     document.addEventListener('pointerdown', onPointerDown)
     document.addEventListener('keydown', onKeyDown)
     return () => {
@@ -45,19 +41,6 @@ export default function DashboardToolbar({ data, errors, period, setPeriod }) {
   return (
     <div className="dashboard-toolbar" ref={root}>
       {menu('period', selectedLabel, periods, setPeriod, 'period-menu-wrap')}
-      <div className="dashboard-menu-wrap">
-        <button className="dashboard-icon-button" type="button" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(!notificationsOpen); setOpenMenu(null) }}>
-          <span aria-hidden="true">♧</span>{notices.length > 0 && <i className="notification-dot" />}
-        </button>
-        {notificationsOpen && <section className="notification-panel" role="status" aria-live="polite">
-          <h3>Notifications</h3>
-          {Object.values(errors).some(Boolean)
-            ? <p>Some account data could not be loaded.</p>
-            : notices.length
-              ? <ul>{notices.map((notice, index) => <li key={`${notice.title}-${index}`}><strong>{notice.title}</strong>{notice.text}</li>)}</ul>
-              : <p>No notifications right now.</p>}
-        </section>}
-      </div>
       <button className="dashboard-avatar" type="button" aria-label="Logout" title="Logout" onClick={() => {
         logout()
         navigate('/login')

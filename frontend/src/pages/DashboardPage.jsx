@@ -21,7 +21,7 @@ export default function DashboardPage() {
     <div className="dashboard-page">
       <section className="dashboard-page-heading">
         <div><p className="dashboard-eyebrow">Overview</p><h1>Dashboard</h1><p className="dashboard-intro">Here's your financial overview.</p></div>
-        <DashboardToolbar data={dashboard} errors={dashboard.errors} period={period} setPeriod={setPeriod} />
+        <DashboardToolbar period={period} setPeriod={setPeriod} />
       </section>
       {dashboard.errors.dashboard && <div className="dashboard-notice" role="alert">{dashboard.errors.dashboard}</div>}
       {dashboard.loading && <div className="dashboard-loading" role="status">Loading your financial overview…</div>}

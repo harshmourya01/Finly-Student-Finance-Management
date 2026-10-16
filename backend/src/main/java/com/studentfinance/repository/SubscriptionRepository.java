@@ -7,10 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import jakarta.persistence.LockModeType;
 import java.util.List;
+import java.time.LocalDate;
+import com.studentfinance.entity.SubscriptionStatus;
 import java.util.Optional;
 
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
     List<Subscription> findAllByUser_Id(Long userId);
+
+    List<Subscription> findAllByStatusAndNextRenewalDateBetween(SubscriptionStatus status, LocalDate from, LocalDate to);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from Subscription s where s.id = :id")

@@ -5,6 +5,7 @@ import com.studentfinance.dto.BudgetResponse;
 import com.studentfinance.entity.Budget;
 import com.studentfinance.entity.Category;
 import com.studentfinance.entity.User;
+import com.studentfinance.entity.NotificationType;
 import com.studentfinance.repository.BudgetRepository;
 import com.studentfinance.repository.CategoryRepository;
 import com.studentfinance.repository.TransactionRepository;
@@ -27,15 +28,18 @@ public class BudgetService {
     private final CategoryRepository categoryRepository;
     private final TransactionRepository transactionRepository;
     private final CurrentUserService currentUserService;
+    private final NotificationService notificationService;
 
     public BudgetService(BudgetRepository budgetRepository,
                          CategoryRepository categoryRepository,
                          TransactionRepository transactionRepository,
-                         CurrentUserService currentUserService) {
+                         CurrentUserService currentUserService,
+                         NotificationService notificationService) {
         this.budgetRepository = budgetRepository;
         this.categoryRepository = categoryRepository;
         this.transactionRepository = transactionRepository;
         this.currentUserService = currentUserService;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -65,6 +69,7 @@ public class BudgetService {
     @Transactional
     public BudgetResponse create(BudgetRequest request) {
         User user = currentUserService.getCurrentUser();
+        notificationService.lockOwner(user);
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid category"));
 
@@ -83,11 +88,13 @@ public class BudgetService {
                 .build();
 
         Budget saved = budgetRepository.save(budget);
+        notifyThresholdsIfReached(saved);
         return toResponse(saved);
     }
 
     @Transactional
     public BudgetResponse update(Long id, BudgetRequest request) {
+        notificationService.lockOwner(currentUserService.getCurrentUser());
         Budget budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Budget not found"));
         verifyOwnership(budget);
@@ -102,6 +109,7 @@ public class BudgetService {
         budget.setMonth(month);
 
         Budget saved = budgetRepository.save(budget);
+        notifyThresholdsIfReached(saved);
         return toResponse(saved);
     }
 
@@ -111,6 +119,36 @@ public class BudgetService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Budget not found"));
         verifyOwnership(budget);
         budgetRepository.delete(budget);
+    }
+
+
+    public void notifyBudgetForExpense(User user, Category category, LocalDate transactionDate) {
+        LocalDate month = transactionDate.withDayOfMonth(1);
+        budgetRepository.findByUser_IdAndCategory_IdAndMonth(user.getId(), category.getId(), month)
+                .ifPresent(this::notifyThresholdsIfReached);
+    }
+
+    private void notifyThresholdsIfReached(Budget budget) {
+        LocalDate start = budget.getMonth().withDayOfMonth(1);
+        LocalDate end = budget.getMonth().withDayOfMonth(budget.getMonth().lengthOfMonth());
+        BigDecimal spent = transactionRepository.calculateSpentAmount(
+                budget.getUser().getId(), budget.getCategory().getId(), start, end);
+        BigDecimal limit = budget.getAmount();
+        String categoryName = budget.getCategory().getName();
+        String periodKey = java.time.YearMonth.from(budget.getMonth()).toString();
+        String keyPrefix = "budget:" + budget.getId() + ":" + budget.getCategory().getId() + ":" + periodKey + ":";
+        if (spent.multiply(BigDecimal.valueOf(100)).compareTo(limit.multiply(BigDecimal.valueOf(80))) >= 0) {
+            notificationService.create(budget.getUser(), NotificationType.BUDGET_80_PERCENT,
+                    "Budget warning",
+                    "You have used at least 80% of your monthly " + categoryName + " budget.",
+                    budget.getId(), keyPrefix + "80");
+        }
+        if (spent.compareTo(limit) >= 0) {
+            notificationService.create(budget.getUser(), NotificationType.BUDGET_100_PERCENT,
+                    "Budget reached",
+                    "You have reached your monthly " + categoryName + " budget limit.",
+                    budget.getId(), keyPrefix + "100");
+        }
     }
 
     private void verifyOwnership(Budget budget) {
